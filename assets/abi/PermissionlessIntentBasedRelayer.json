@@ -1,0 +1,66 @@
+[
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "relayer",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "string",
+        "name": "relayerMetadataUri",
+        "type": "string"
+      }
+    ],
+    "name": "NewRelayer",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "relayer",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "string",
+        "name": "newRelayerMetadataUri",
+        "type": "string"
+      }
+    ],
+    "name": "RelayerUpdated",
+    "type": "event"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "string",
+        "name": "relayerMetadataUri",
+        "type": "string"
+      }
+    ],
+    "name": "registerAsRelayer",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "string",
+        "name": "newRelayerMetadataUri",
+        "type": "string"
+      }
+    ],
+    "name": "updateRelayerMetadataUri",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  }
+]

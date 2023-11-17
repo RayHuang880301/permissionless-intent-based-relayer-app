@@ -1,0 +1,16 @@
+[
+  {
+    "address": "0x1234567890123456789012345678901234567890",
+    "relayerMetadataUri": "https://example.com/relayer-metadata.json",
+    "totalRelayed": "5",
+    "lastRelayed": "1700049000",
+    "status": "online"
+  },
+  {
+    "address": "0x0987654321098765432109876543210987654321",
+    "relayerMetadataUri": "https://example.com/relayer-metadata.json",
+    "totalRelayed": "1",
+    "lastRelayed": "1700049017",
+    "status": "offline"
+  }
+]
