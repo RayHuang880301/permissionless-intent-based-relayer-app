@@ -1,0 +1,3 @@
+export const ERC20PERMIT_ADDRESS = {
+  GOERLI: "0x7757c98945BF38f48E2b897Db320145D48e7C8C5" as `0x${string}`,
+};
