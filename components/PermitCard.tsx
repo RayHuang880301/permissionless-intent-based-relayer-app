@@ -69,6 +69,7 @@ export default function PermitCard() {
         args: [address, MOCK_SPENDER, MOCK_VALUE, deadline, v, r, s],
       });
       setCalldata(calldata);
+      console.log("calldata", calldata);
     } else {
       console.log("Please sign first");
     }
@@ -101,75 +102,19 @@ export default function PermitCard() {
   };
 
   /** Step 2 */
-
   useEffect(() => {
     if (signatureHex) {
       const { r, s, v } = hexToSignature(signatureHex);
-
       const calldata = encodeFunctionData({
         abi: ERC20PERMIT_ABI,
         functionName: "permit",
         args: [address, MOCK_SPENDER, MOCK_VALUE, deadline, v, r, s],
       });
-      // recoverAddress(data, v, r, s)
       setCalldata(calldata);
-      console.log({
-        address,
-        MOCK_SPENDER,
-        MOCK_VALUE,
-        deadline,
-        v,
-        r,
-        s,
-      });
-
-      const payload: RelayerTxPayload = {
-        chainId: chain!.id,
-        toAddress: erc20PermitAddr!,
-        fee: "0",
-        feeToken: "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE",
-        value: "0",
-        calldata: calldata,
-      };
-      doSendTxToRelayer(payload);
     } else {
       console.log("Please sign first");
     }
-  }, [data]);
-
-  const doSendTxToRelayer = async (payload: RelayerTxPayload) => {
-    try {
-      toast({
-        title: "Sending request to relayer",
-        description: "Please wait",
-        status: "info",
-        position: "top",
-        duration: 10000,
-        isClosable: true,
-      });
-      const result = await sendTxToRelayer(API_URL, payload);
-      console.log({
-        result,
-      });
-      toast({
-        title: "Success",
-        description: "Relayer request sent",
-        status: "success",
-        position: "top",
-        duration: 10000,
-        isClosable: true,
-      });
-    } catch (error: any) {
-      toast({
-        title: "Error: sendTxToRelayer",
-        description: error.message,
-        status: "error",
-        position: "top",
-        duration: 10000,
-        isClosable: true,
-      });
-    }
-  };
+  }, [signatureHex]);
 
   return (
     <Flex className="flex flex-col justify-between items-center h-full">

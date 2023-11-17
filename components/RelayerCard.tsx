@@ -13,6 +13,7 @@ import {
   Text,
   ModalFooter,
   Icon,
+  useToast,
 } from "@chakra-ui/react";
 import mockRelayers from "../mockData/relayers.json";
 import { shortenAddress } from "../utils/helper";
@@ -21,30 +22,23 @@ import axios from "axios";
 import { useNetwork } from "wagmi";
 import dayjs from "dayjs";
 import { RelayerInfo } from "../type";
+import { RelayerTxPayload, sendTxToRelayer } from "../api/relayer";
 
-const END_POINT = "https://intent-relayer.vercel.app/send-tx";
+const API_URL = "https://intent-relayer.vercel.app/send-tx";
 
 type Props = {
   toAddress: `0x${string}` | undefined;
   calldata: `0x${string}` | undefined;
 };
 
-type SendTxRequest = {
-  chainId: number;
-  toAddress: string;
-  fee: string;
-  feeToken: string;
-  value: string;
-  calldata: string;
-};
-
 export default function RelayerCard(props: Props) {
   const { calldata, toAddress } = props;
+  const toast = useToast();
   const [relayers, setRelayers] = useState(mockRelayers);
   const [checkedItems, setCheckedItems] = useState<boolean[]>([]);
   const { isOpen, onOpen, onClose } = useDisclosure();
   const { chain } = useNetwork();
-  const [req, setReq] = useState<SendTxRequest>({
+  const [req, setReq] = useState<RelayerTxPayload>({
     chainId: chain?.id || 1,
     toAddress: toAddress!,
     fee: "0",
@@ -52,6 +46,8 @@ export default function RelayerCard(props: Props) {
     value: "0",
     calldata: calldata!,
   });
+
+  console.log("calldata", calldata);
 
   useEffect(() => {
     if (chain) {
@@ -61,18 +57,6 @@ export default function RelayerCard(props: Props) {
       });
     }
   }, [chain]);
-
-  const send = async (req: SendTxRequest) => {
-    if (!calldata || !toAddress) return;
-    try {
-      const res = await axios.post(END_POINT, {
-        req,
-      });
-      console.log(res.data);
-    } catch (err) {
-      console.log(err);
-    }
-  };
 
   const sortedByTotalTx = () => {
     const sorted = mockRelayers.sort((a, b) => {
@@ -88,6 +72,49 @@ export default function RelayerCard(props: Props) {
     });
     setRelayers(sorted);
     console.log(relayers);
+  };
+
+  const send = async (req: RelayerTxPayload) => {
+    if (!calldata || !toAddress) return;
+    try {
+      await doSendTxToRelayer(req);
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+  const doSendTxToRelayer = async (payload: RelayerTxPayload) => {
+    try {
+      toast({
+        title: "Sending request to relayer",
+        description: "Please wait",
+        status: "info",
+        position: "top",
+        duration: 10000,
+        isClosable: true,
+      });
+      const result = await sendTxToRelayer(API_URL, payload);
+      console.log({
+        result,
+      });
+      toast({
+        title: "Success",
+        description: "Relayer request sent",
+        status: "success",
+        position: "top",
+        duration: 10000,
+        isClosable: true,
+      });
+    } catch (error: any) {
+      toast({
+        title: "Error: sendTxToRelayer",
+        description: error.message,
+        status: "error",
+        position: "top",
+        duration: 10000,
+        isClosable: true,
+      });
+    }
   };
 
   return (
