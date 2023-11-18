@@ -25,7 +25,10 @@ import { RelayerInfo } from "../type";
 import { RelayerTxPayload, sendTxToRelayer } from "../api/relayer";
 import { subgraph } from "../lib/subgraph";
 import { RelayerProvider, RelayerContext } from "./RelayerProvider";
-import { RelayerPermitCountProvider, RelayerPermitCountContext } from "./RelayerPermitCountProvider";
+import {
+  RelayerPermitCountProvider,
+  RelayerPermitCountContext,
+} from "./RelayerPermitCountProvider";
 import { getChainInfo } from "../utils/getContractAddr";
 
 const API_URL = "http://194.195.123.201:8888/send-tx";
@@ -95,7 +98,13 @@ export default function RelayerCard(props: Props) {
                 };
                 const key = `${info.metadataId}-${info.name}-${info.address}}`;
                 setRelayers((prev) => {
-                  const isExist = prev.some((relayer) => key === `${relayer.metadataId}-${relayer.name}-${relayer.address.toLowerCase()}}`);
+                  const isExist = prev.some(
+                    (relayer) =>
+                      key ===
+                      `${relayer.metadataId}-${
+                        relayer.name
+                      }-${relayer.address.toLowerCase()}}`
+                  );
                   if (!isExist) {
                     return [...prev, info];
                   }
@@ -264,7 +273,7 @@ export default function RelayerCard(props: Props) {
                 </Text>
                 <Text
                   className="col-span-3"
-                _hover={{
+                  _hover={{
                     cursor: "pointer",
                     bgColor: "gray.100",
                   }}
@@ -278,67 +287,61 @@ export default function RelayerCard(props: Props) {
                 </Text>
                 <Text className="col-span-2">Status</Text>
               </div>
-              <div className="grid grid-cols-12 gap-4 w-full text-right font-base text-lg">
-                <Checkbox
-                  className="col-span-12"
-                  isChecked={checkedItems.every(Boolean)}
-                  onChange={toggleSelectAll}
-                >
-                  Select all
-                </Checkbox>
-              </div>
-              <RelayerPermitCountProvider chainConfig={getChainInfo(chain?.id || 5)}>
-
+              <RelayerPermitCountProvider
+                chainConfig={getChainInfo(chain?.id || 5)}
+              >
                 <RelayerPermitCountContext.Consumer>
-                  {({ countMap }) => (<>
-                    {relayers.map((relayer, index) => (
-                <RelayerProvider key={index} relayer={relayer} relayerInfo={countMap[relayer.address]}>
-                  <RelayerContext.Consumer>
-                    {({ status, lastTxTime, totalTx }) => (
-                      <div
-                        className="grid grid-cols-12 gap-4 w-full text-right font-base text-lg"
-                      >
-                        <Checkbox
-                          className="col-span-3"
-                          isChecked={checkedItems[index]}
-                          onChange={(e) => {
-                            const newCheckedItems = [...checkedItems];
-                            newCheckedItems[index] = e.target.checked;
-                            setCheckedItems(newCheckedItems);
-                          }}
+                  {({ countMap }) => (
+                    <>
+                      {relayers.map((relayer, index) => (
+                        <RelayerProvider
+                          key={index}
+                          relayer={relayer}
+                          relayerInfo={countMap[relayer.address]}
                         >
-                          {relayer.name}
-                        </Checkbox>
-                        <Text className="col-span-2">{shortenAddress(relayer.address)}</Text>
-                        <Text className="col-span-2">
-                          {totalTx}
-                        </Text>
-                        <Text className="col-span-3">
-                          {lastTxTime}
-                        </Text>
-                        <Text className="col-span-2">
-                          <Icon
-                            viewBox="0 0 200 200"
-                            color={
-                              status === "online" ? "green.500" : "red.500"
-                            }
-                          >
-                            <path
-                              fill="currentColor"
-                              d="M 100, 100 m -75, 0 a 75,75 0 1,0 150,0 a 75,75 0 1,0 -150,0"
-                            />
-                          </Icon>
-                          {status}
-                        </Text>
-                      </div>
-                    )}
-                  </RelayerContext.Consumer>
-                </RelayerProvider>
-              ))}
-              </>)}
+                          <RelayerContext.Consumer>
+                            {({ status, lastTxTime, totalTx }) => (
+                              <div className="grid grid-cols-12 gap-4 w-full text-right font-base text-lg">
+                                <Checkbox
+                                  className="col-span-3"
+                                  isChecked={checkedItems[index]}
+                                  onChange={(e) => {
+                                    const newCheckedItems = [...checkedItems];
+                                    newCheckedItems[index] = e.target.checked;
+                                    setCheckedItems(newCheckedItems);
+                                  }}
+                                >
+                                  {relayer.name}
+                                </Checkbox>
+                                <Text className="col-span-2">
+                                  {shortenAddress(relayer.address)}
+                                </Text>
+                                <Text className="col-span-2">{totalTx}</Text>
+                                <Text className="col-span-3">{lastTxTime}</Text>
+                                <Text className="col-span-2">
+                                  <Icon
+                                    viewBox="0 0 200 200"
+                                    color={
+                                      status === "online"
+                                        ? "green.500"
+                                        : "red.500"
+                                    }
+                                  >
+                                    <path
+                                      fill="currentColor"
+                                      d="M 100, 100 m -75, 0 a 75,75 0 1,0 150,0 a 75,75 0 1,0 -150,0"
+                                    />
+                                  </Icon>
+                                  {status}
+                                </Text>
+                              </div>
+                            )}
+                          </RelayerContext.Consumer>
+                        </RelayerProvider>
+                      ))}
+                    </>
+                  )}
                 </RelayerPermitCountContext.Consumer>
-
-
               </RelayerPermitCountProvider>
             </Flex>
           </ModalBody>

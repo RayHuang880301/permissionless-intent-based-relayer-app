@@ -16,7 +16,7 @@ export const ERC20PERMIT_ADDRESS = {
 };
 
 export const RELAYER_MANEGER_ADDRESS = {
-  GOERLI: "0x3C45Bc53DB5D63838b3dDabd59c5A6b6cDcFbb62" as `0x${string}`,
+  GOERLI: "0x4304B50Bd3600C198ad38B70FDa8ffF3517534b8" as `0x${string}`,
   GNOSIS: "0x30839399b487819d3c01e923f9e61038e1500fee" as `0x${string}`,
   ARBITRUM_GOERLI:
     "0x74fEA6283db6bb4b20c3714F5c01a129FD1FaCdF" as `0x${string}`,
