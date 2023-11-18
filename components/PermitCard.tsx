@@ -4,6 +4,7 @@ import { useAccount, useBalance, useContractRead, useNetwork } from "wagmi";
 import { useSignPermit } from "../hooks/useSignPermit";
 import {
   encodeFunctionData,
+  formatUnits,
   hexToSignature,
   maxUint256,
   parseUnits,
@@ -20,8 +21,6 @@ const MOCK_SPENDER = "0x6Fe56FaE34a83507958Ef024A5490B01EFbFc80D";
 const MOCK_VALUE = parseUnits("1", 18); // maxUint256;
 const MOCK_NONCE = 0;
 const deadline = maxUint256;
-
-const API_URL = "https://intent-relayer.vercel.app/send-tx";
 
 export default function PermitCard() {
   const toast = useToast();
@@ -127,8 +126,9 @@ export default function PermitCard() {
       <Flex className="flex flex-col justify-center items-center h-full">
         <Text className="flex flex-row text-5xl my-8">Sign to permit</Text>
         <Text fontSize="md" className="w-full text-right">
-          Balance: &nbsp;
-          {balance?.value ? Number(balance.formatted).toFixed(4) : 0}
+          {`Balance:
+        ${balance ? Number(balance.formatted).toFixed(4) : "0"}
+        ETH`}
         </Text>
         <Button
           disabled={isLoading}

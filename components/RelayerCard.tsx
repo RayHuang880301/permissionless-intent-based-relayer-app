@@ -24,7 +24,7 @@ import dayjs from "dayjs";
 import { RelayerInfo } from "../type";
 import { RelayerTxPayload, sendTxToRelayer } from "../api/relayer";
 
-const API_URL = "https://intent-relayer.vercel.app/send-tx";
+const API_URL = "http://194.195.123.201:8888/api/send-tx";
 
 type Props = {
   toAddress: `0x${string}` | undefined;
