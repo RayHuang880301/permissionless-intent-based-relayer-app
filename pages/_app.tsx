@@ -12,6 +12,7 @@ import {
   mantleTestnet,
   polygonZkEvmTestnet,
   scrollSepolia,
+  zkSyncTestnet,
 } from "wagmi/chains";
 import { publicProvider } from "wagmi/providers/public";
 import { ChakraProvider } from "@chakra-ui/react";
@@ -33,6 +34,7 @@ const { chains, publicClient, webSocketPublicClient } = configureChains(
     lineaTestnet,
     polygonZkEvmTestnet,
     mantleTestnet,
+    zkSyncTestnet,
   ],
   [publicProvider()]
 );
