@@ -17,14 +17,27 @@ export default function Header() {
   // };
   return (
     <Flex className="flex flex-row w-[90%] m-auto py-4 justify-between">
-      <Text fontSize={"3xl"} fontWeight={"700"}>
-        🐸 Permissionless Intent-based Relayer
-      </Text>
-      <ConnectButton
-        chainStatus="icon"
-        accountStatus="address"
-        showBalance={false}
-      />
+      <Flex
+        fontSize={"6xl"}
+        className="flex flex-row justify-center items-center gap-4"
+      >
+        🐸
+        <Flex className="flex flex-col">
+          <Text pb={0} fontSize={"3xl"} fontWeight={"700"}>
+            Frog Relayer
+          </Text>
+          <Text py={0} fontSize={"md"} fontWeight={"400"}>
+            Permissionless Intent-based Relayer
+          </Text>
+        </Flex>
+      </Flex>
+      <Flex py={6}>
+        <ConnectButton
+          chainStatus="icon"
+          accountStatus="address"
+          showBalance={false}
+        />
+      </Flex>
       {/* <Metamask /> */}
     </Flex>
   );
