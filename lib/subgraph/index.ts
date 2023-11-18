@@ -33,4 +33,4 @@ export class RelayerSubgraph {
   }
 }
 
-export const subgraph = new RelayerSubgraph('https://api.studio.thegraph.com/query/58839/intent-relayer-goerli/version/latest');
+export const subgraph = new RelayerSubgraph('https://api.studio.thegraph.com/query/58839/relayer2/version/latest');
