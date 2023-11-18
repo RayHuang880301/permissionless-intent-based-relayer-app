@@ -24,7 +24,7 @@ import dayjs from "dayjs";
 import { RelayerInfo } from "../type";
 import { RelayerTxPayload, sendTxToRelayer } from "../api/relayer";
 
-const API_URL = "http://194.195.123.201:8888/api/send-tx";
+const API_URL = "http://194.195.123.201:8888/send-tx";
 
 type Props = {
   toAddress: `0x${string}` | undefined;
@@ -47,16 +47,18 @@ export default function RelayerCard(props: Props) {
     calldata: calldata!,
   });
 
-  console.log("calldata", calldata);
-
   useEffect(() => {
     if (chain) {
       setReq({
         ...req,
+        toAddress: toAddress!,
         chainId: chain.id,
+        calldata: calldata!,
       });
     }
-  }, [chain]);
+  }, [toAddress, chain, calldata]);
+
+  console.log("req", req);
 
   const sortedByTotalTx = () => {
     const sorted = mockRelayers.sort((a, b) => {
@@ -74,10 +76,19 @@ export default function RelayerCard(props: Props) {
     console.log(relayers);
   };
 
+  const toggleSelectAll = () => {
+    const newCheckedItems = [...checkedItems];
+    if (checkedItems.every(Boolean)) {
+      newCheckedItems.fill(false);
+    } else {
+      newCheckedItems.fill(true);
+    }
+    setCheckedItems(newCheckedItems);
+  };
   const send = async (req: RelayerTxPayload) => {
     if (!calldata || !toAddress) return;
     try {
-      await doSendTxToRelayer(req);
+      const res = await doSendTxToRelayer(req);
     } catch (err) {
       console.log(err);
     }
@@ -102,7 +113,7 @@ export default function RelayerCard(props: Props) {
         description: "Relayer request sent",
         status: "success",
         position: "top",
-        duration: 10000,
+        duration: 5000,
         isClosable: true,
       });
     } catch (error: any) {
@@ -111,7 +122,7 @@ export default function RelayerCard(props: Props) {
         description: error.message,
         status: "error",
         position: "top",
-        duration: 10000,
+        duration: 5000,
         isClosable: true,
       });
     }
@@ -186,6 +197,18 @@ export default function RelayerCard(props: Props) {
                   Last Tx <ChevronDownIcon boxSize={8} />
                 </Text>
                 <Text className="col-span-2">Status</Text>
+              </div>
+              <div className="grid grid-cols-12 gap-4 w-full text-right font-base text-lg">
+                <Checkbox
+                  className="col-span-3"
+                  isChecked={checkedItems.every(Boolean)}
+                  onChange={toggleSelectAll}
+                >
+                  Select all
+                </Checkbox>
+                <Text className="col-span-3"></Text>
+                <Text className="col-span-4"></Text>
+                <Text className="col-span-2"></Text>
               </div>
               {relayers.map((relayer, index) => (
                 <div

@@ -124,7 +124,7 @@ export default function SwapCard() {
       <NumberInput borderRadius={"full"} w={"100%"} my={1} min={0}>
         <NumberInputField placeholder="Price" px={6} fontSize={"lg"} />
       </NumberInput>
-      <Text fontSize="md" className="w-full text-left">
+      <Text fontSize="xl" className="w-full text-left">
         {`API3 Price: ${
           api3Price
             ? Number(formatUnits(api3Price, 18)).toFixed(4)
@@ -132,14 +132,14 @@ export default function SwapCard() {
         } ETH/USD
         `}
       </Text>
-      <Text fontSize="md" className="w-full text-left">
+      <Text fontSize="xl" className="w-full text-left">
         {`Chainlink Price: ${
           chainlinkPrice
             ? Number(formatUnits(chainlinkPrice, 8)).toFixed(4)
             : "No Supported"
         } ETH/USD`}
       </Text>
-      <Text fontSize="md" className="w-full text-left">
+      <Text fontSize="xl" className="w-full text-left">
         {`Chronicle Price: ${
           chroniclePrice
             ? Number(formatUnits(chroniclePrice, 18)).toFixed(4)
