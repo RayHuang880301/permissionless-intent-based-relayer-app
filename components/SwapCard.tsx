@@ -260,14 +260,13 @@ export default function SwapCard() {
             : "No Supported"
         } ETH/USD`}
       </Text>
-      <Text fontSize="xl" className="w-full text-left">
+      <Text fontSize="xl" className="w-full text-left mb-8">
         {`Chronicle Price: ${
           chroniclePrice
             ? Number(formatUnits(chroniclePrice, 18)).toFixed(4)
             : "No Supported"
         } ETH/USD`}
       </Text>
-
       <RelayerCard calldata={calldata} toAddress={MOCK_CONTRACT_ADDR} />
     </Flex>
   );

@@ -26,15 +26,15 @@ import {
 
 const { chains, publicClient, webSocketPublicClient } = configureChains(
   [
-    baseGoerli,
     goerli,
     arbitrumGoerli,
+    baseGoerli,
+    zkSyncTestnet,
     gnosis,
     scrollSepolia,
     lineaTestnet,
     polygonZkEvmTestnet,
     mantleTestnet,
-    zkSyncTestnet,
   ],
   [publicProvider()]
 );
