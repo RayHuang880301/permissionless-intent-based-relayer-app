@@ -29,7 +29,7 @@ export default function PermitCard() {
   const [calldata, setCalldata] = useState<`0x${string}`>();
   const { chain } = useNetwork();
   const { address } = useAccount();
-  const { data } = useBalance({
+  const { data: balance, refetch: refetchBalance } = useBalance({
     address: address,
   });
   const {
@@ -61,6 +61,12 @@ export default function PermitCard() {
   );
 
   useEffect(() => {
+    setInterval(() => {
+      refetchBalance();
+    }, 5000);
+  }, []);
+
+  useEffect(() => {
     if (signatureHex) {
       const { r, s, v } = hexToSignature(signatureHex);
       const calldata = encodeFunctionData({
@@ -73,7 +79,7 @@ export default function PermitCard() {
     } else {
       console.log("Please sign first");
     }
-  }, [data]);
+  }, [signatureHex]);
 
   useEffect(() => {
     if (chain) {
@@ -120,6 +126,10 @@ export default function PermitCard() {
     <Flex className="flex flex-col justify-between items-center h-full">
       <Flex className="flex flex-col justify-center items-center h-full">
         <Text className="flex flex-row text-5xl my-8">Sign to permit</Text>
+        <Text fontSize="md" className="w-full text-right">
+          Balance: &nbsp;
+          {balance?.value ? Number(balance.formatted).toFixed(4) : 0}
+        </Text>
         <Button
           disabled={isLoading}
           className="w-80 py-6"
