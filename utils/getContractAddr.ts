@@ -11,6 +11,8 @@ export const getERC20PermitAddr = (chainId: number): `0x${string}` => {
     return ERC20PERMIT_ADDRESS.SCROLL_SEPOLIA;
   } else if (chainId === 59140) {
     return ERC20PERMIT_ADDRESS.LINEA_TESTNET;
+  } else if (chainId === 1442) {
+    return ERC20PERMIT_ADDRESS.POLYGON_ZKEVM_TESTNET;
   } else {
     throw new Error("Unsupported chainId");
   }

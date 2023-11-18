@@ -8,6 +8,7 @@ import {
   gnosis,
   goerli,
   lineaTestnet,
+  polygonZkEvmTestnet,
   scrollSepolia,
 } from "wagmi/chains";
 import { publicProvider } from "wagmi/providers/public";
@@ -21,7 +22,14 @@ import {
 } from "@metamask/sdk-react-ui";
 
 const { chains, publicClient, webSocketPublicClient } = configureChains(
-  [goerli, gnosis, scrollSepolia, arbitrumGoerli, lineaTestnet],
+  [
+    goerli,
+    arbitrumGoerli,
+    gnosis,
+    scrollSepolia,
+    lineaTestnet,
+    polygonZkEvmTestnet,
+  ],
   [publicProvider()]
 );
 
