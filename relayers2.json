@@ -1,0 +1,9 @@
+{
+  "relayers": [
+    {
+      "name": "Toad",
+      "sendTxUrl": "http://194.195.123.201:8889/send-tx",
+      "healthCheckUrl": "http://194.195.123.201:8889/health"
+    }
+  ]
+}

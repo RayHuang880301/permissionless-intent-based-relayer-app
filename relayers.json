@@ -1,14 +1,9 @@
 {
   "relayers": [
     {
-      "name": "Relayer 1",
+      "name": "Frog",
       "sendTxUrl": "http://194.195.123.201:8888/send-tx",
       "healthCheckUrl": "http://194.195.123.201:8888/health"
-    },
-    {
-      "name": "Relayer 2",
-      "sendTxUrl": "https://intent-relayer.vercel.app/send-tx",
-      "healthCheckUrl": "https://intent-relayer.vercel.app/health"
     }
   ]
 }

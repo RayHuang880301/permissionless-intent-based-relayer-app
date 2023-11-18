@@ -255,12 +255,12 @@ export async function getPermitLogs(
     });
     return logs;
   } catch (error: any) {
-    if(error.code === -32601) {
-      // the method eth_newFilter does not exist/is not available
-      console.warn("eth_newFilter is not available, try eth_getLogs");
-      return await getRawLogs(publicClient, contractAddress, fromBlock, toBlock);
-    }
-    throw error;
+    // if(error.code === -32601) {
+    //   // the method eth_newFilter does not exist/is not available
+    // }
+    console.warn("eth_newFilter is not available, try eth_getLogs");
+    return await getRawLogs(publicClient, contractAddress, fromBlock, toBlock);
+    // throw error;
   }
 }
 
