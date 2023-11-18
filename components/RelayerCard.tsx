@@ -259,10 +259,9 @@ export default function RelayerCard(props: Props) {
           <ModalBody>
             <Flex className="flex flex-col w-full gap-2">
               <div className="grid grid-cols-12 gap-4 w-full text-right font-bold text-xl">
-                <Text className="col-span-3 text-left">Relayer Name</Text>
-                <Text className="col-span-2 text-left">Relayer Address</Text>
+                <Text className="col-span-3 text-left">Relayer Address</Text>
                 <Text
-                  className="col-span-2"
+                  className="col-span-3"
                   _hover={{
                     cursor: "pointer",
                     bgColor: "gray.100",
@@ -276,7 +275,7 @@ export default function RelayerCard(props: Props) {
                   Total Tx <ChevronDownIcon boxSize={8} />
                 </Text>
                 <Text
-                  className="col-span-3"
+                  className="col-span-4"
                   _hover={{
                     cursor: "pointer",
                     bgColor: "gray.100",
@@ -292,7 +291,6 @@ export default function RelayerCard(props: Props) {
                 <Text className="col-span-2">Status</Text>
               </div>
               <RelayerPermitCountProvider chainConfig={chainInfo}>
-
                 <RelayerPermitCountContext.Consumer>
                   {({ countMap }) => (
                     <>
@@ -314,13 +312,15 @@ export default function RelayerCard(props: Props) {
                                     setCheckedItems(newCheckedItems);
                                   }}
                                 >
-                                  {relayer.name}
-                                </Checkbox>
-                                <Text className="col-span-2">
                                   {shortenAddress(relayer.address)}
+                                </Checkbox>
+                                {/* <Text className="col-span-2">
+                                  {shortenAddress(relayer.address)}
+                                </Text> */}
+                                <Text className="col-span-3">{totalTx}</Text>
+                                <Text className="col-span-4">
+                                  {lastTxTime ?? "Loading"}
                                 </Text>
-                                <Text className="col-span-2">{totalTx}</Text>
-                                <Text className="col-span-3">{lastTxTime}</Text>
                                 <Text className="col-span-2">
                                   <Icon
                                     viewBox="0 0 200 200"
