@@ -5,6 +5,7 @@ import type { AppProps } from "next/app";
 import { configureChains, createConfig, WagmiConfig } from "wagmi";
 import {
   arbitrumGoerli,
+  baseGoerli,
   gnosis,
   goerli,
   lineaTestnet,
@@ -24,6 +25,7 @@ import {
 
 const { chains, publicClient, webSocketPublicClient } = configureChains(
   [
+    baseGoerli,
     goerli,
     arbitrumGoerli,
     gnosis,
