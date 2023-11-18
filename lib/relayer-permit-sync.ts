@@ -163,7 +163,7 @@ export class RelayerPermitDataCollector {
       } catch (error) {
         console.error(error);
         EventCacheItem.isSyncing = false;
-        await updateRelayerPermitFromEvents(EventCacheItem, tmpEvents);
+        await updateRelayerPermitFromEvents(context.publicClient, EventCacheItem, tmpEvents);
         contractPermitCache.set(this.key, EventCacheItem);
         throw error;
       }
@@ -176,7 +176,7 @@ export class RelayerPermitDataCollector {
       context,
       tmpEvents,
     });
-    await updateRelayerPermitFromEvents(EventCacheItem, tmpEvents);
+    await updateRelayerPermitFromEvents(context.publicClient, EventCacheItem, tmpEvents);
     EventCacheItem.isSyncing = false;
 
     // NOTE: only sync from rpc would assign `context.currentEndBlock` to EventCacheItem.endBlock
@@ -189,6 +189,7 @@ export class RelayerPermitDataCollector {
 }
 
 export async function updateRelayerPermitFromEvents(
+  PublicClient: PublicClient,
   EventCacheItem: EventCacheItem,
   newEvents: PermitLogsType
 ) {
@@ -214,19 +215,23 @@ export async function updateRelayerPermitFromEvents(
     console.log({
       ev
     })
-    const spender = ev.spender.toLowerCase();
+    // const spender = ev.spender.toLowerCase();
     // const amount = ev.amount;
     const blockNumber = Number(ev.blockNumber);
+    const tx = await PublicClient.getTransaction({
+      hash: ev.txHash as any as `0x${string}`,
+    })
+    const from = tx.from.toLowerCase();
 
-    if (!EventCacheItem.permittedCountMap[spender]) {
-      EventCacheItem.permittedCountMap[spender] = {
+    if (!EventCacheItem.permittedCountMap[from]) {
+      EventCacheItem.permittedCountMap[from] = {
         count: 0,
         lastBlockNumber: 0,
       };
     }
-    EventCacheItem.permittedCountMap[spender].count += 1;
-    if (blockNumber > EventCacheItem.permittedCountMap[spender].lastBlockNumber) {
-      EventCacheItem.permittedCountMap[spender].lastBlockNumber = blockNumber;
+    EventCacheItem.permittedCountMap[from].count += 1;
+    if (blockNumber > EventCacheItem.permittedCountMap[from].lastBlockNumber) {
+      EventCacheItem.permittedCountMap[from].lastBlockNumber = blockNumber;
     }
   }
 
