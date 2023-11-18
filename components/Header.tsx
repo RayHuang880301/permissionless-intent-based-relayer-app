@@ -1,6 +1,7 @@
 import { Flex, Spacer } from "@chakra-ui/react";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
 import React, { useState } from "react";
+import Metamask from "./Metamask";
 
 export default function Header() {
   // const [account, setAccount] = useState<string>();
@@ -22,18 +23,7 @@ export default function Header() {
         accountStatus="address"
         showBalance={false}
       />
-      {/* <button style={{ padding: 10, margin: 10 }} onClick={connect}>
-        Connect
-      </button>
-      {connected && (
-        <div>
-          <>
-            {chainId && `Connected chain: ${chainId}`}
-            <p></p>
-            {account && `Connected account: ${account}`}
-          </>
-        </div>
-      )} */}
+      {/* <Metamask /> */}
     </Flex>
   );
 }

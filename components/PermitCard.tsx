@@ -1,6 +1,14 @@
 import { Button, Flex, Text, useToast } from "@chakra-ui/react";
 import React, { useEffect, useState } from "react";
-import { useAccount, useBalance, useContractRead, useNetwork } from "wagmi";
+import {
+  useAccount,
+  useBalance,
+  useContractRead,
+  useContractWrite,
+  useNetwork,
+  usePrepareContractWrite,
+  useWaitForTransaction,
+} from "wagmi";
 import { useSignPermit } from "../hooks/useSignPermit";
 import {
   encodeFunctionData,
@@ -17,8 +25,9 @@ import axios from "axios";
 import { RelayerTxPayload, sendTxToRelayer } from "../api/relayer";
 
 const MOCK_SPENDER = "0x6Fe56FaE34a83507958Ef024A5490B01EFbFc80D";
-const MOCK_VALUE = parseUnits("1", 18); // maxUint256;
+const MOCK_VALUE = parseUnits("1", 18);
 const deadline = maxUint256;
+const MINT_VALUE = parseUnits("10", 18);
 
 export default function PermitCard() {
   const toast = useToast();
@@ -65,6 +74,19 @@ export default function PermitCard() {
     Number(nonce),
     deadline
   );
+
+  const { config } = usePrepareContractWrite({
+    address: erc20PermitAddr,
+    abi: ERC20PERMIT_ABI,
+    functionName: "mint",
+    args: [address, MINT_VALUE],
+  });
+  const { data, writeAsync } = useContractWrite(config);
+
+  const { isLoading: isMintLoading, isSuccess: isMintSuccess } =
+    useWaitForTransaction({
+      hash: data?.hash,
+    });
 
   useEffect(() => {
     setInterval(() => {
@@ -117,11 +139,16 @@ export default function PermitCard() {
     <Flex className="flex flex-col justify-between items-center h-full">
       <Flex className="flex flex-col justify-center items-center h-full">
         <Text className="flex flex-row text-5xl my-8">Sign to permit</Text>
-        <Text fontSize="md" className="w-full text-right">
-          {`Balance:
+        <Flex className="flex flex-row w-full justify-between">
+          <Button boxSize={6} fontSize={"md"} w={"16"} onClick={writeAsync}>
+            mint
+          </Button>
+          <Text fontSize="md">
+            {`Balance:
         ${balance ? Number(formatUnits(balance as bigint, 18)).toFixed(4) : "0"}
         `}
-        </Text>
+          </Text>
+        </Flex>
         <Button
           disabled={isLoading}
           className="w-80 py-6"

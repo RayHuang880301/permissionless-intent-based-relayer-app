@@ -3,15 +3,25 @@ import "@rainbow-me/rainbowkit/styles.css";
 import { getDefaultWallets, RainbowKitProvider } from "@rainbow-me/rainbowkit";
 import type { AppProps } from "next/app";
 import { configureChains, createConfig, WagmiConfig } from "wagmi";
-import { goerli } from "wagmi/chains";
+import {
+  arbitrumGoerli,
+  gnosis,
+  goerli,
+  lineaTestnet,
+  scrollSepolia,
+} from "wagmi/chains";
 import { publicProvider } from "wagmi/providers/public";
 import { ChakraProvider } from "@chakra-ui/react";
 import Metamask from "../components/Metamask";
-import NonSSRWrapper from '../components/NoSSR';
-import { MetaMaskButton, MetaMaskUIProvider, useSDK } from "@metamask/sdk-react-ui";
+import NonSSRWrapper from "../components/NoSSR";
+import {
+  MetaMaskButton,
+  MetaMaskUIProvider,
+  useSDK,
+} from "@metamask/sdk-react-ui";
 
 const { chains, publicClient, webSocketPublicClient } = configureChains(
-  [goerli],
+  [goerli, gnosis, scrollSepolia, arbitrumGoerli, lineaTestnet],
   [publicProvider()]
 );
 
@@ -29,22 +39,20 @@ const wagmiConfig = createConfig({
 });
 
 function MyApp({ Component, pageProps }: AppProps) {
-
   return (
     <ChakraProvider>
       <WagmiConfig config={wagmiConfig}>
         <RainbowKitProvider chains={chains}>
-        <MetaMaskUIProvider
-        sdkOptions={{
-          dappMetadata: {
-            name: "Demo UI React App",
-          },
-        }}
-      >
-          <Component {...pageProps} />
-          <Metamask />
-
-      </MetaMaskUIProvider>
+          <MetaMaskUIProvider
+            sdkOptions={{
+              dappMetadata: {
+                name: "Demo UI React App",
+              },
+            }}
+          >
+            <Component {...pageProps} />
+            {/* <Metamask /> */}
+          </MetaMaskUIProvider>
         </RainbowKitProvider>
       </WagmiConfig>
     </ChakraProvider>
