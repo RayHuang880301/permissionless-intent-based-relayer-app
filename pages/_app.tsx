@@ -55,16 +55,15 @@ function MyApp({ Component, pageProps }: AppProps) {
     <ChakraProvider>
       <WagmiConfig config={wagmiConfig}>
         <RainbowKitProvider chains={chains}>
-          <MetaMaskUIProvider
+          {/* <MetaMaskUIProvider
             sdkOptions={{
               dappMetadata: {
                 name: "Demo UI React App",
               },
             }}
-          >
-            <Component {...pageProps} />
-            {/* <Metamask /> */}
-          </MetaMaskUIProvider>
+          > */}
+          <Component {...pageProps} />
+          {/* </MetaMaskUIProvider> */}
         </RainbowKitProvider>
       </WagmiConfig>
     </ChakraProvider>
