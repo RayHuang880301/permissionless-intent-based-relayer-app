@@ -1,0 +1,10 @@
+query RelayerQuery {
+  newRelayers {
+    id
+    relayer
+    relayerMetadataUri
+    blockNumber
+    blockTimestamp
+    transactionHash
+  }
+}

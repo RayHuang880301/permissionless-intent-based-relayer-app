@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import {
   Modal,
   ModalOverlay,
@@ -23,6 +23,8 @@ import { useNetwork } from "wagmi";
 import dayjs from "dayjs";
 import { RelayerInfo } from "../type";
 import { RelayerTxPayload, sendTxToRelayer } from "../api/relayer";
+import { subgraph } from "../lib/subgraph";
+import { RelayerProvider, RelayerContext } from "./RelayerProvider";
 
 const API_URL = "http://194.195.123.201:8888/send-tx";
 
@@ -34,7 +36,7 @@ type Props = {
 export default function RelayerCard(props: Props) {
   const { calldata, toAddress } = props;
   const toast = useToast();
-  const [relayers, setRelayers] = useState(mockRelayers);
+  const [relayers, setRelayers] = useState<Array<RelayerInfo>>([]);
   const [checkedItems, setCheckedItems] = useState<boolean[]>([]);
   const { isOpen, onOpen, onClose } = useDisclosure();
   const { chain } = useNetwork();
@@ -47,7 +49,68 @@ export default function RelayerCard(props: Props) {
     calldata: calldata!,
   });
 
-  console.log("req", req);
+  useEffect(() => {
+    getRelayers();
+  }, [])
+
+  const fetchRelayerMetadata = async (url: string) => {
+    try {
+      
+    } catch (err) {
+
+    }
+  }
+
+  const getRelayers = useCallback( async () => {
+    console.log('getRelayers');
+    try {
+      const { data } = await subgraph.fetchRelayers();
+      console.log({
+        data,
+      })
+      const currentRelayers = relayers;
+      for (let index = 0; index < data.newRelayers.length; index++) {
+        const item = data.newRelayers[index];
+        const metadataUri = item.relayerMetadataUri;
+        if (metadataUri) {
+          try {
+            const {data: metadataData } = await axios.get(metadataUri);
+            if(metadataData.relayers instanceof Array) {
+              for (let index = 0; index < metadataData.relayers.length; index++) {
+                // const currentRelayInfo = currentRelayers.find((relayer) => );
+                const relayer = metadataData.relayers[index];
+                const info: RelayerInfo = {
+                  metadataId: item.id,
+                  name: relayer.name,
+                  address: item.relayer,
+                  relayerMetadataUri: metadataUri,
+                  healthCheckUrl: relayer.healthCheckUrl,
+                  sendTxUrl: relayer.sendTxUrl,
+                  totalRelayed: '0',
+                  lastRelayed: '0',
+                  status: 'loading',
+                };
+                const key = `${info.metadataId}-${info.name}-${info.address}}`;
+                setRelayers((prev) => {
+                  const isExist = prev.some((relayer) => relayer.metadataId === item.id && relayer.name === info.name);
+                  if (!isExist) {
+                    return [...prev, info];
+                  }
+                  return prev;
+                });
+              }
+            }
+          } catch (err) {
+            console.warn(`Error fetching metadata for relayer ${item.id}, metadataUri: ${metadataUri}`);
+          }
+        }
+        
+      }
+    } catch (err) {
+      console.error(err);
+
+    }
+  }, []);
 
   useEffect(() => {
     if (chain) {
@@ -63,19 +126,19 @@ export default function RelayerCard(props: Props) {
   console.log("req", req);
 
   const sortedByTotalTx = () => {
-    const sorted = mockRelayers.sort((a, b) => {
+    const sorted = relayers.sort((a, b) => {
       return Number(b.totalRelayed) - Number(a.totalRelayed);
     });
     setRelayers(sorted);
-    console.log(relayers);
+    console.log('sortedByTotalTx', relayers);
   };
 
   const sortedByLastTx = () => {
-    const sorted = mockRelayers.sort((a, b) => {
+    const sorted = relayers.sort((a, b) => {
       return Number(b.lastRelayed) - Number(a.lastRelayed);
     });
     setRelayers(sorted);
-    console.log(relayers);
+    console.log('sortedByLastTx', relayers);
   };
 
   const toggleSelectAll = () => {
@@ -98,6 +161,11 @@ export default function RelayerCard(props: Props) {
 
   const doSendTxToRelayer = async (payload: RelayerTxPayload) => {
     try {
+      console.log({
+        checkedItems
+      })
+      const selectedRelayers = relayers.filter((relayer, index) => checkedItems[index]);
+      
       toast({
         title: "Sending request to relayer",
         description: "Please wait",
@@ -106,9 +174,12 @@ export default function RelayerCard(props: Props) {
         duration: 10000,
         isClosable: true,
       });
-      const result = await sendTxToRelayer(API_URL, payload);
+      const promiseList = selectedRelayers.map(async (relayer) => {
+        return await sendTxToRelayer(relayer.sendTxUrl, payload);
+      });
+      const resultList = await Promise.all(promiseList);
       console.log({
-        result,
+        resultList,
       });
       toast({
         title: "Success",
@@ -161,7 +232,7 @@ export default function RelayerCard(props: Props) {
       >
         select relayer
       </Button>
-      <Modal isOpen={isOpen} onClose={onClose} size={"3xl"}>
+      <Modal isOpen={isOpen} onClose={onClose} size={"4xl"}>
         <ModalOverlay />
         <ModalContent>
           <ModalHeader>Select relayers</ModalHeader>
@@ -169,9 +240,10 @@ export default function RelayerCard(props: Props) {
           <ModalBody>
             <Flex className="flex flex-col w-full gap-2">
               <div className="grid grid-cols-12 gap-4 w-full text-right font-bold text-xl">
-                <Text className="col-span-3 text-left">Relayer Address</Text>
+              <Text className="col-span-3 text-left">Relayer Name</Text>
+              <Text className="col-span-2 text-left">Relayer Address</Text>
                 <Text
-                  className="col-span-3"
+                  className="col-span-2"
                   _hover={{
                     cursor: "pointer",
                     bgColor: "gray.100",
@@ -185,7 +257,7 @@ export default function RelayerCard(props: Props) {
                   Total Tx <ChevronDownIcon boxSize={8} />
                 </Text>
                 <Text
-                  className="col-span-4"
+                  className="col-span-3"
                   _hover={{
                     cursor: "pointer",
                     bgColor: "gray.100",
@@ -202,53 +274,57 @@ export default function RelayerCard(props: Props) {
               </div>
               <div className="grid grid-cols-12 gap-4 w-full text-right font-base text-lg">
                 <Checkbox
-                  className="col-span-3"
+                  className="col-span-12"
                   isChecked={checkedItems.every(Boolean)}
                   onChange={toggleSelectAll}
                 >
                   Select all
                 </Checkbox>
-                <Text className="col-span-3"></Text>
-                <Text className="col-span-4"></Text>
-                <Text className="col-span-2"></Text>
               </div>
               {relayers.map((relayer, index) => (
-                <div
-                  key={index}
-                  className="grid grid-cols-12 gap-4 w-full text-right font-base text-lg"
-                >
-                  <Checkbox
-                    className="col-span-3"
-                    isChecked={checkedItems[index]}
-                    onChange={(e) => {
-                      const newCheckedItems = [...checkedItems];
-                      newCheckedItems[index] = e.target.checked;
-                      setCheckedItems(newCheckedItems);
-                    }}
-                  >
-                    {shortenAddress(relayer.address)}
-                  </Checkbox>
-                  <Text className="col-span-3">{relayer.totalRelayed}</Text>
-                  <Text className="col-span-4">
-                    {dayjs
-                      .unix(Number(relayer.lastRelayed))
-                      .format("YYYY-MM-DD HH:mm:ss")}
-                  </Text>
-                  <Text className="col-span-2">
-                    <Icon
-                      viewBox="0 0 200 200"
-                      color={
-                        relayer.status === "online" ? "green.500" : "red.500"
-                      }
-                    >
-                      <path
-                        fill="currentColor"
-                        d="M 100, 100 m -75, 0 a 75,75 0 1,0 150,0 a 75,75 0 1,0 -150,0"
-                      />
-                    </Icon>
-                    {relayer.status}
-                  </Text>
-                </div>
+                <RelayerProvider key={index} relayer={relayer}>
+                  <RelayerContext.Consumer>
+                    {({ status }) => (
+                      <div
+                        className="grid grid-cols-12 gap-4 w-full text-right font-base text-lg"
+                      >
+                        <Checkbox
+                          className="col-span-3"
+                          isChecked={checkedItems[index]}
+                          onChange={(e) => {
+                            const newCheckedItems = [...checkedItems];
+                            newCheckedItems[index] = e.target.checked;
+                            setCheckedItems(newCheckedItems);
+                          }}
+                        >
+                          {relayer.name}
+                        </Checkbox>
+                        <Text className="col-span-2">{shortenAddress(relayer.address)}</Text>
+                        <Text className="col-span-2">{relayer.totalRelayed}</Text>
+                        <Text className="col-span-3">
+                          {dayjs
+                            .unix(Number(relayer.lastRelayed))
+                            .format("YYYY-MM-DD HH:mm:ss")}
+                        </Text>
+                        <Text className="col-span-2">
+                          <Icon
+                            viewBox="0 0 200 200"
+                            color={
+                              status === "online" ? "green.500" : "red.500"
+                            }
+                          >
+                            <path
+                              fill="currentColor"
+                              d="M 100, 100 m -75, 0 a 75,75 0 1,0 150,0 a 75,75 0 1,0 -150,0"
+                            />
+                          </Icon>
+                          {status}
+                        </Text>
+                      </div>
+                    )}
+                  </RelayerContext.Consumer>
+                </RelayerProvider>
+                
               ))}
             </Flex>
           </ModalBody>
