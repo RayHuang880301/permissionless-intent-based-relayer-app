@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { use, useCallback, useEffect, useMemo, useState } from "react";
 import {
   Modal,
   ModalOverlay,
@@ -216,6 +216,10 @@ export default function RelayerCard(props: Props) {
     }
   };
 
+  const chainInfo = useMemo(() => {
+    return getChainInfo(chain?.id || 1);
+  }, [chain]);
+
   return (
     <>
       <Button
@@ -287,9 +291,8 @@ export default function RelayerCard(props: Props) {
                 </Text>
                 <Text className="col-span-2">Status</Text>
               </div>
-              <RelayerPermitCountProvider
-                chainConfig={getChainInfo(chain?.id || 5)}
-              >
+              <RelayerPermitCountProvider chainConfig={chainInfo}>
+
                 <RelayerPermitCountContext.Consumer>
                   {({ countMap }) => (
                     <>

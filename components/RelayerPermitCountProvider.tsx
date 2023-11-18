@@ -130,6 +130,10 @@ export function RelayerPermitCountProvider({
 
 
   useEffect(() => {
+    console.log({
+      message: 'RelayerPermitCountProvider dataCollector changed',
+      dataCollector
+    })
     if(!dataCollector) return;
     setCountMap({});
     const CollectorCacheList = Array.from(CollectorCache);
