@@ -47,6 +47,8 @@ export default function RelayerCard(props: Props) {
     calldata: calldata!,
   });
 
+  console.log("req", req);
+
   useEffect(() => {
     if (chain) {
       setReq({

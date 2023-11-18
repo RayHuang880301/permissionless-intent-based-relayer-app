@@ -1,4 +1,4 @@
-import { Flex, Spacer } from "@chakra-ui/react";
+import { Flex, Spacer, Text } from "@chakra-ui/react";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
 import React, { useState } from "react";
 import Metamask from "./Metamask";
@@ -17,7 +17,9 @@ export default function Header() {
   // };
   return (
     <Flex className="flex flex-row w-[90%] m-auto py-4 justify-between">
-      <Spacer />
+      <Text fontSize={"3xl"} fontWeight={"700"}>
+        🐸 Permissionless Intent-based Relayer
+      </Text>
       <ConnectButton
         chainStatus="icon"
         accountStatus="address"

@@ -136,8 +136,8 @@ export default function PermitCard() {
   }, [signatureHex]);
 
   return (
-    <Flex className="flex flex-col justify-between items-center h-full">
-      <Flex className="flex flex-col justify-center items-center h-full">
+    <Flex className="flex flex-col h-full">
+      <Flex className="flex flex-col justify-center items-center my-16">
         <Text className="flex flex-row text-5xl my-8">Sign to permit</Text>
         <Flex className="flex flex-row w-full justify-between">
           <Button boxSize={6} fontSize={"md"} w={"16"} onClick={writeAsync}>
@@ -146,7 +146,7 @@ export default function PermitCard() {
           <Text fontSize="md">
             {`Balance:
         ${balance ? Number(formatUnits(balance as bigint, 18)).toFixed(4) : "0"}
-        `}
+        🐸FROG`}
           </Text>
         </Flex>
         <Button

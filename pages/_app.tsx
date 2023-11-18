@@ -8,6 +8,7 @@ import {
   gnosis,
   goerli,
   lineaTestnet,
+  mantleTestnet,
   polygonZkEvmTestnet,
   scrollSepolia,
 } from "wagmi/chains";
@@ -29,6 +30,7 @@ const { chains, publicClient, webSocketPublicClient } = configureChains(
     scrollSepolia,
     lineaTestnet,
     polygonZkEvmTestnet,
+    mantleTestnet,
   ],
   [publicProvider()]
 );
