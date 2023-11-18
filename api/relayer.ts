@@ -11,7 +11,9 @@ export interface RelayerTxPayload {
 
 export async function sendTxToRelayer(url: string, payload: RelayerTxPayload) {
   try {
-    const res = await axios.post(url, payload);
+    const res = await axios.post(url, payload, {
+      // withCredentials: true,
+    });
     return res.data;
   } catch (err: any) {
     console.error(err);
