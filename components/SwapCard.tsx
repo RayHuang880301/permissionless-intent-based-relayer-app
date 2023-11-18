@@ -30,6 +30,7 @@ import { useSignSwap } from "../hooks/useSignSwap";
 import { DEFAULT_NATIVE_TOKEN } from "../config";
 import ERC20PERMIT_ABI from "../assets/abi/ERC20Permit.json";
 import MOCKSWAP_ABI from "../assets/abi/MockSwap.json";
+import { getString } from "../utils/helper";
 
 const MOCK_CONTRACT_ADDR = "0x6Fe56FaE34a83507958Ef024A5490B01EFbFc80D";
 const MOCK_USDC_ADDR = "0xd35CCeEAD182dcee0F148EbaC9447DA2c4D449c4";
@@ -43,12 +44,10 @@ const API3_ETH_USD_PRICE_FEED = "0x26690F9f17FdC26D419371315bc17950a0FC90eD";
 const CHRONICLE_ETH_USD_PRICE_FEED =
   "0x90430C5b8045a1E2A0Fc4e959542a0c75b576439";
 
-const goerliTransport = http(
-  "https://eth-goerli.g.alchemy.com/v2/jeFJuYIBL2oK6D2faoJ5y3HT8uJtyUkt"
-);
+const goerliTransport = http(getString(process.env.NEXT_PUBLIC_GOERLI_RPC_URL));
 
 const sepoliaTransport = http(
-  "https://eth-sepolia.g.alchemy.com/v2/SFDKOfaYqT5PC4z-XkemespE2XbBUmaW"
+  getString(process.env.NEXT_PUBLIC_SEPOLIA_RPC_URL)
 );
 
 const goerliClient = createPublicClient({

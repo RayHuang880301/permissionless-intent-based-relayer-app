@@ -31,8 +31,6 @@ import {
 } from "./RelayerPermitCountProvider";
 import { getChainInfo } from "../utils/getContractAddr";
 
-const API_URL = "http://194.195.123.201:8888/send-tx";
-
 type Props = {
   toAddress: `0x${string}` | undefined;
   calldata: `0x${string}` | undefined;
