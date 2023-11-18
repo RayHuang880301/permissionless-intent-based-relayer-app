@@ -217,7 +217,7 @@ export default function RelayerCard(props: Props) {
   };
 
   const chainInfo = useMemo(() => {
-    return getChainInfo(chain?.id || 1);
+    return getChainInfo(chain?.id || 5);
   }, [chain]);
 
   return (
