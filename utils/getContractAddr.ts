@@ -17,6 +17,8 @@ export const getERC20PermitAddr = (chainId: number): `0x${string}` => {
     return ERC20PERMIT_ADDRESS.MANTLE_TESTNET;
   } else if (chainId === 84531) {
     return ERC20PERMIT_ADDRESS.BASE_GOERLI;
+  } else if (chainId === 280) {
+    return ERC20PERMIT_ADDRESS.ZKSYNC_TESTNET;
   } else {
     throw new Error("Unsupported chainId");
   }

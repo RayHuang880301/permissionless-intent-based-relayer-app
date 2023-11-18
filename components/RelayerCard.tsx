@@ -53,32 +53,33 @@ export default function RelayerCard(props: Props) {
 
   useEffect(() => {
     getRelayers();
-  }, [])
+  }, []);
 
   const fetchRelayerMetadata = async (url: string) => {
     try {
-      
-    } catch (err) {
+    } catch (err) {}
+  };
 
-    }
-  }
-
-  const getRelayers = useCallback( async () => {
-    console.log('getRelayers');
+  const getRelayers = useCallback(async () => {
+    console.log("getRelayers");
     try {
       const { data } = await subgraph.fetchRelayers();
       console.log({
         data,
-      })
+      });
       const currentRelayers = relayers;
       for (let index = 0; index < data.newRelayers.length; index++) {
         const item = data.newRelayers[index];
         const metadataUri = item.relayerMetadataUri;
         if (metadataUri) {
           try {
-            const {data: metadataData } = await axios.get(metadataUri);
-            if(metadataData.relayers instanceof Array) {
-              for (let index = 0; index < metadataData.relayers.length; index++) {
+            const { data: metadataData } = await axios.get(metadataUri);
+            if (metadataData.relayers instanceof Array) {
+              for (
+                let index = 0;
+                index < metadataData.relayers.length;
+                index++
+              ) {
                 // const currentRelayInfo = currentRelayers.find((relayer) => );
                 const relayer = metadataData.relayers[index];
                 const info: RelayerInfo = {
@@ -88,9 +89,9 @@ export default function RelayerCard(props: Props) {
                   relayerMetadataUri: metadataUri,
                   healthCheckUrl: relayer.healthCheckUrl,
                   sendTxUrl: relayer.sendTxUrl,
-                  totalRelayed: '0',
-                  lastRelayed: '0',
-                  status: 'loading',
+                  totalRelayed: "0",
+                  lastRelayed: "0",
+                  status: "loading",
                 };
                 const key = `${info.metadataId}-${info.name}-${info.address}}`;
                 setRelayers((prev) => {
@@ -103,14 +104,14 @@ export default function RelayerCard(props: Props) {
               }
             }
           } catch (err) {
-            console.warn(`Error fetching metadata for relayer ${item.id}, metadataUri: ${metadataUri}`);
+            console.warn(
+              `Error fetching metadata for relayer ${item.id}, metadataUri: ${metadataUri}`
+            );
           }
         }
-        
       }
     } catch (err) {
       console.error(err);
-
     }
   }, []);
 
@@ -132,7 +133,7 @@ export default function RelayerCard(props: Props) {
       return Number(b.totalRelayed) - Number(a.totalRelayed);
     });
     setRelayers(sorted);
-    console.log('sortedByTotalTx', relayers);
+    console.log("sortedByTotalTx", relayers);
   };
 
   const sortedByLastTx = () => {
@@ -140,7 +141,7 @@ export default function RelayerCard(props: Props) {
       return Number(b.lastRelayed) - Number(a.lastRelayed);
     });
     setRelayers(sorted);
-    console.log('sortedByLastTx', relayers);
+    console.log("sortedByLastTx", relayers);
   };
 
   const toggleSelectAll = () => {
@@ -164,10 +165,12 @@ export default function RelayerCard(props: Props) {
   const doSendTxToRelayer = async (payload: RelayerTxPayload) => {
     try {
       console.log({
-        checkedItems
-      })
-      const selectedRelayers = relayers.filter((relayer, index) => checkedItems[index]);
-      
+        checkedItems,
+      });
+      const selectedRelayers = relayers.filter(
+        (relayer, index) => checkedItems[index]
+      );
+
       toast({
         title: "Sending request to relayer",
         description: "Please wait",
@@ -242,8 +245,8 @@ export default function RelayerCard(props: Props) {
           <ModalBody>
             <Flex className="flex flex-col w-full gap-2">
               <div className="grid grid-cols-12 gap-4 w-full text-right font-bold text-xl">
-              <Text className="col-span-3 text-left">Relayer Name</Text>
-              <Text className="col-span-2 text-left">Relayer Address</Text>
+                <Text className="col-span-3 text-left">Relayer Name</Text>
+                <Text className="col-span-2 text-left">Relayer Address</Text>
                 <Text
                   className="col-span-2"
                   _hover={{
@@ -330,7 +333,6 @@ export default function RelayerCard(props: Props) {
                     )}
                   </RelayerContext.Consumer>
                 </RelayerProvider>
-                
               ))}
               </>)}
                 </RelayerPermitCountContext.Consumer>

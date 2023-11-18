@@ -12,6 +12,7 @@ import {
   mantleTestnet,
   polygonZkEvmTestnet,
   scrollSepolia,
+  zkSyncTestnet,
 } from "wagmi/chains";
 import { publicProvider } from "wagmi/providers/public";
 import { ChakraProvider } from "@chakra-ui/react";
@@ -25,9 +26,10 @@ import {
 
 const { chains, publicClient, webSocketPublicClient } = configureChains(
   [
-    baseGoerli,
     goerli,
     arbitrumGoerli,
+    baseGoerli,
+    zkSyncTestnet,
     gnosis,
     scrollSepolia,
     lineaTestnet,
