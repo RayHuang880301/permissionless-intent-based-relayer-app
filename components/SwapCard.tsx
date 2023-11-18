@@ -69,7 +69,7 @@ export default function SwapCard() {
       address: API3_ETH_USD_PRICE_FEED,
       abi: API3_ABI,
       functionName: "read",
-    });
+    }) as any;
     setApi3Price(api3Price[0] as bigint);
   };
 
