@@ -25,6 +25,8 @@ import { RelayerInfo } from "../type";
 import { RelayerTxPayload, sendTxToRelayer } from "../api/relayer";
 import { subgraph } from "../lib/subgraph";
 import { RelayerProvider, RelayerContext } from "./RelayerProvider";
+import { RelayerPermitCountProvider, RelayerPermitCountContext } from "./RelayerPermitCountProvider";
+import { getChainInfo } from "../utils/getContractAddr";
 
 const API_URL = "http://194.195.123.201:8888/send-tx";
 
@@ -82,7 +84,7 @@ export default function RelayerCard(props: Props) {
                 const info: RelayerInfo = {
                   metadataId: item.id,
                   name: relayer.name,
-                  address: item.relayer,
+                  address: item.relayer.toLowerCase(),
                   relayerMetadataUri: metadataUri,
                   healthCheckUrl: relayer.healthCheckUrl,
                   sendTxUrl: relayer.sendTxUrl,
@@ -92,7 +94,7 @@ export default function RelayerCard(props: Props) {
                 };
                 const key = `${info.metadataId}-${info.name}-${info.address}}`;
                 setRelayers((prev) => {
-                  const isExist = prev.some((relayer) => relayer.metadataId === item.id && relayer.name === info.name);
+                  const isExist = prev.some((relayer) => key === `${relayer.metadataId}-${relayer.name}-${relayer.address.toLowerCase()}}`);
                   if (!isExist) {
                     return [...prev, info];
                   }
@@ -258,7 +260,7 @@ export default function RelayerCard(props: Props) {
                 </Text>
                 <Text
                   className="col-span-3"
-                  _hover={{
+                _hover={{
                     cursor: "pointer",
                     bgColor: "gray.100",
                   }}
@@ -281,10 +283,14 @@ export default function RelayerCard(props: Props) {
                   Select all
                 </Checkbox>
               </div>
-              {relayers.map((relayer, index) => (
-                <RelayerProvider key={index} relayer={relayer}>
+              <RelayerPermitCountProvider chainConfig={getChainInfo(chain?.id || 5)}>
+
+                <RelayerPermitCountContext.Consumer>
+                  {({ countMap }) => (<>
+                    {relayers.map((relayer, index) => (
+                <RelayerProvider key={index} relayer={relayer} relayerInfo={countMap[relayer.address]}>
                   <RelayerContext.Consumer>
-                    {({ status }) => (
+                    {({ status, lastTxTime, totalTx }) => (
                       <div
                         className="grid grid-cols-12 gap-4 w-full text-right font-base text-lg"
                       >
@@ -300,11 +306,11 @@ export default function RelayerCard(props: Props) {
                           {relayer.name}
                         </Checkbox>
                         <Text className="col-span-2">{shortenAddress(relayer.address)}</Text>
-                        <Text className="col-span-2">{relayer.totalRelayed}</Text>
+                        <Text className="col-span-2">
+                          {totalTx}
+                        </Text>
                         <Text className="col-span-3">
-                          {dayjs
-                            .unix(Number(relayer.lastRelayed))
-                            .format("YYYY-MM-DD HH:mm:ss")}
+                          {lastTxTime}
                         </Text>
                         <Text className="col-span-2">
                           <Icon
@@ -326,6 +332,11 @@ export default function RelayerCard(props: Props) {
                 </RelayerProvider>
                 
               ))}
+              </>)}
+                </RelayerPermitCountContext.Consumer>
+
+
+              </RelayerPermitCountProvider>
             </Flex>
           </ModalBody>
           <ModalFooter>
