@@ -1,3 +1,6 @@
+export const DEFAULT_NATIVE_TOKEN =
+  "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE";
+
 export const ERC20PERMIT_ADDRESS = {
   GOERLI: "0x9Fda380dEE070cDc213840D770D5BD010B56D642" as `0x${string}`,
   GNOSIS: "0x419c2e4d9e9d272e20c894c788f31cf7ed1c1eaf" as `0x${string}`,

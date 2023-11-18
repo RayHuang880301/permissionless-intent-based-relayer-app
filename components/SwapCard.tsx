@@ -4,17 +4,36 @@ import {
   Image,
   NumberInput,
   NumberInputField,
+  Button,
+  useToast,
 } from "@chakra-ui/react";
 import React, { useEffect, useState } from "react";
 import ethIcon from "../assets/icon/ethereum-pos.png";
 import usdcIcon from "../assets/icon/usd-coin-wormhole-from-ethereum.png";
 import RelayerCard from "./RelayerCard";
-import { useAccount, useBalance, useContractRead } from "wagmi";
+import { useAccount, useBalance, useContractRead, useNetwork } from "wagmi";
 import AGGREGATOR_V3_ABI from "../assets/abi/AggregatorV3.json";
 import API3_ABI from "../assets/abi/API3.json";
 import CHRONICLE_ABI from "../assets/abi/ChronicleOracle.json";
-import { createPublicClient, formatUnits, http } from "viem";
+import {
+  createPublicClient,
+  encodeFunctionData,
+  formatUnits,
+  hexToSignature,
+  http,
+  maxUint256,
+  parseUnits,
+} from "viem";
 import { goerli } from "viem/chains";
+import { useSignPermit } from "../hooks/useSignPermit";
+import { useSignSwap } from "../hooks/useSignSwap";
+import { DEFAULT_NATIVE_TOKEN } from "../config";
+import ERC20PERMIT_ABI from "../assets/abi/ERC20Permit.json";
+import MOCKSWAP_ABI from "../assets/abi/MockSwap.json";
+
+const MOCK_CONTRACT_ADDR = "0x6Fe56FaE34a83507958Ef024A5490B01EFbFc80D";
+const MOCK_USDC_ADDR = "0xd35CCeEAD182dcee0F148EbaC9447DA2c4D449c4";
+const MOCK_ZERO_FOR_ONE = true;
 
 const CHAINLINK_ETH_USD_PRICE_FEED =
   "0xD4a33860578De61DBAbDc8BFdb98FD742fA7028e";
@@ -42,18 +61,93 @@ const sepoliaClient = createPublicClient({
   transport: sepoliaTransport,
 });
 
+const MOCK_VALUE = parseUnits("1", 18);
+const deadline = maxUint256;
+const MINT_VALUE = parseUnits("10", 18);
+const MOCK_NONCE = 0;
+
 export default function SwapCard() {
+  const toast = useToast();
   const { address } = useAccount();
+  const { chain } = useNetwork();
   const [chainlinkPrice, setChainlinkPrice] = useState<bigint>();
   const [api3Price, setApi3Price] = useState<bigint>();
   const [chroniclePrice, setChroniclePrice] = useState<bigint>();
+  const [amount, setAmount] = useState<bigint>();
+  const [price, setPrice] = useState<bigint>();
+  const [calldata, setCalldata] = useState<`0x${string}`>();
   const {
     data: balance,
-    isError,
-    isLoading,
+    isError: isBalanceError,
+    isLoading: isBalanceLoading,
   } = useBalance({
     address: address,
   });
+
+  const {
+    data: signatureHex,
+    isError,
+    isLoading,
+    isSuccess,
+    signTypedDataAsync,
+  } = useSignSwap(
+    chain?.id || 1,
+    MOCK_CONTRACT_ADDR,
+    DEFAULT_NATIVE_TOKEN,
+    MOCK_USDC_ADDR,
+    MOCK_ZERO_FOR_ONE,
+    amount!,
+    MOCK_NONCE,
+    deadline
+  );
+
+  const handleSignSwap = async () => {
+    if (address && chain && amount && price) {
+      try {
+        await signTypedDataAsync();
+      } catch (error) {
+        console.log(error);
+      }
+    } else if (!address || !chain) {
+      toast({
+        title: "Please connect your wallet",
+        status: "error",
+        duration: 5000,
+        isClosable: true,
+      });
+    } else if (!amount || !price) {
+      toast({
+        title: "Please input amount and price",
+        status: "error",
+        duration: 5000,
+        isClosable: true,
+      });
+    }
+  };
+
+  useEffect(() => {
+    if (signatureHex) {
+      const { r, s, v } = hexToSignature(signatureHex);
+      const calldata = encodeFunctionData({
+        abi: MOCKSWAP_ABI,
+        functionName: "swapPermit",
+        args: [
+          DEFAULT_NATIVE_TOKEN,
+          MOCK_USDC_ADDR,
+          MOCK_ZERO_FOR_ONE,
+          amount,
+          MOCK_NONCE,
+          deadline,
+          v,
+          r,
+          s,
+        ],
+      });
+      setCalldata(calldata);
+    } else {
+      console.log("Please sign first");
+    }
+  }, [signatureHex]);
 
   const getChainlinkPrice = async () => {
     const chainlinkPrice = await goerliClient.readContract({
@@ -65,11 +159,11 @@ export default function SwapCard() {
   };
 
   const getApi3Price = async () => {
-    const api3Price = await goerliClient.readContract({
+    const api3Price = (await goerliClient.readContract({
       address: API3_ETH_USD_PRICE_FEED,
       abi: API3_ABI,
       functionName: "read",
-    }) as any;
+    })) as any;
     setApi3Price(api3Price[0] as bigint);
   };
 
@@ -119,11 +213,38 @@ export default function SwapCard() {
         ETH`}
       </Text>
       <NumberInput borderRadius={"full"} w={"100%"} my={1} min={0}>
-        <NumberInputField placeholder="Amount" px={6} fontSize={"lg"} />
+        <NumberInputField
+          placeholder="Amount"
+          px={6}
+          fontSize={"lg"}
+          onChange={(e) => setAmount(parseUnits(e.target.value, 18))}
+        />
       </NumberInput>
       <NumberInput borderRadius={"full"} w={"100%"} my={1} min={0}>
-        <NumberInputField placeholder="Price" px={6} fontSize={"lg"} />
+        <NumberInputField
+          placeholder="Price"
+          px={6}
+          fontSize={"lg"}
+          onChange={(e) => setPrice(BigInt(e.target.value))}
+        />
       </NumberInput>
+      <Button
+        disabled={isLoading}
+        className="w-80 py-6"
+        borderRadius="full"
+        textColor={"white"}
+        bgColor="blue.400"
+        _hover={{
+          bgColor: "blue.500",
+        }}
+        _active={{
+          bgColor: "blue.400",
+        }}
+        transitionDuration={"0.2s"}
+        onClick={() => handleSignSwap()}
+      >
+        Sign
+      </Button>
       <Text fontSize="xl" className="w-full text-left">
         {`API3 Price: ${
           api3Price
@@ -146,7 +267,8 @@ export default function SwapCard() {
             : "No Supported"
         } ETH/USD`}
       </Text>
-      {/* <RelayerCard calldata={calldata} erc20PermitAddr={erc20PermitAddr} /> */}
+
+      <RelayerCard calldata={calldata} toAddress={MOCK_CONTRACT_ADDR} />
     </Flex>
   );
 }
